@@ -39,4 +39,6 @@ void** cr_run(cr_env* env, cr_thread_function func, void** batons);
 
 void cr_env_destroy(cr_env* env);
 
+void cr_handle_result();
+
 #endif

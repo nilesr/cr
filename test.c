@@ -1,7 +1,9 @@
-#include <stdlib.h>
+#include <stdio.h>
 #include "cr.h"
 
 void* thread_func(int tid, void* baton) {
+   printf("GOT SOMETHING\n");
+   return NULL;
 }
 
 int main(int argc, char** argv) {
