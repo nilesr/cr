@@ -3,8 +3,8 @@ S_O=$(patsubst %.s,%.o,$(S))
 C=cr.c cr_yield_do.c
 C_O=$(patsubst %.c,%.o,$(C))
 
-CFLAGS=-ggdb3 -std=c11 -Wall
-ASFLAGS=-ggdb3
+CFLAGS=-ggdb3 -std=c11 -Wall -Ofast
+ASFLAGS=-ggdb3 -Ofast
 
 all: test
 

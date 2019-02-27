@@ -4,6 +4,7 @@
 #include <assert.h>
 #include <string.h>
 #include <stdio.h>
+#include <alloca.h>
 
 cr_env* cr_env_new(int n) {
    assert(n > 0);
@@ -38,29 +39,29 @@ void cr_run_internal(cr_env* env) {
    // pop all the rest of the registers
    // pop saved rsp into rsp last
    // ret -- this will pop an instruction pointer off the stack and jump to it, and stack pointer will still be set correctly
-   intptr_t regs[] = {
-	 (env->frames[env->current].rip),
-	 (env->frames[env->current].rsp),
+   intptr_t* regs = alloca(16 * sizeof(intptr_t));
+   memcpy(regs + 0, &env->frames[env->current].rip, sizeof(intptr_t));
+   memcpy(regs + 1, &env->frames[env->current].rsp, sizeof(intptr_t));
 
-	 (env->frames[env->current].r13),
-	 (env->frames[env->current].r12),
-	 (env->frames[env->current].r11),
-	 (env->frames[env->current].r10),
-	 (env->frames[env->current].r9),
-	 (env->frames[env->current].r8),
-	 (env->frames[env->current].rdi),
-	 (env->frames[env->current].rsi),
-	 (env->frames[env->current].rbp),
-	 // skip rsp
-	 (env->frames[env->current].rdx),
-	 (env->frames[env->current].rcx),
-	 (env->frames[env->current].rbx),
-	 (env->frames[env->current].rax),
+   memcpy(regs + 2, &env->frames[env->current].r13, sizeof(intptr_t));
+   memcpy(regs + 3, &env->frames[env->current].r12, sizeof(intptr_t));
+   memcpy(regs + 4, &env->frames[env->current].r11, sizeof(intptr_t));
+   memcpy(regs + 5, &env->frames[env->current].r10, sizeof(intptr_t));
+   memcpy(regs + 6, &env->frames[env->current].r9, sizeof(intptr_t));
+   memcpy(regs + 7, &env->frames[env->current].r8, sizeof(intptr_t));
+   memcpy(regs + 8, &env->frames[env->current].rdi, sizeof(intptr_t));
+   memcpy(regs + 9, &env->frames[env->current].rsi, sizeof(intptr_t));
+   memcpy(regs + 10, &env->frames[env->current].rbp, sizeof(intptr_t));
+   // skip rsp
+   memcpy(regs + 11, &env->frames[env->current].rdx, sizeof(intptr_t));
+   memcpy(regs + 12, &env->frames[env->current].rcx, sizeof(intptr_t));
+   memcpy(regs + 13, &env->frames[env->current].rbx, sizeof(intptr_t));
+   memcpy(regs + 14, &env->frames[env->current].rax, sizeof(intptr_t));
+   // rsp as last thing to be popped before we ret
+   memcpy(regs + 15, &env->frames[env->current].rsp, sizeof(intptr_t));
 
-      // rsp as last thing to be popped before we ret
-	 (env->frames[env->current].rsp)
-   };
-   _Static_assert((((intptr_t) &regs[1]) - ((intptr_t) &regs[0])) == sizeof(intptr_t), "Arrays not packed");
+   // Do not make regs a regular array, gcc thinks we don't use the values in it and optimizes it out
+
    __asm__(
 	 "mov %0, %%rsp;\n"
 	 "pop %%rax;\n" // holds saved rip
