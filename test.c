@@ -2,7 +2,7 @@
 #include "cr.h"
 
 void* thread_func(int tid, void* baton) {
-   printf("Got baton %p\n", baton);
+   printf("Thread %d got baton %p\n", tid, baton);
    return NULL;
 }
 

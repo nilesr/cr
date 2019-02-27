@@ -26,7 +26,9 @@ typedef struct cr_context {
 typedef struct cr_env {
 	int count;
 	int current;
+	int dead;
 	cr_context* frames;
+	cr_context master;
 	void** results;
 } cr_env;
 
