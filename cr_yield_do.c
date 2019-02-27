@@ -1,10 +1,8 @@
 #include "cr.h"
 
 #include <stdlib.h>
-#include <stdio.h>
 
 void cr_yield_do(intptr_t rsp, cr_env* env) {
-   printf("cr_yield_do got rsp %p, env %p\n", (void*) rsp, env);
    __asm__(
 	 "movq %9, %%rsp;\n"
 	 "popq %0;\n"
@@ -51,6 +49,9 @@ void cr_yield_do(intptr_t rsp, cr_env* env) {
 	 : "r" (rsp)
 	 : "%rsp"
 	 );
+   // We were callq'd, which pushed %rip to the stack right before we saved the stack pointer.
+   // When we go back into the calling code, it expects that that's been popped off already.
+   env->frames[env->current].rsp += sizeof(intptr_t);
 
    cr_run_internal(env);
 }
