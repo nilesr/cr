@@ -23,7 +23,6 @@ void** cr_run(cr_env* env, cr_thread_function func, void** batons) {
    for (int i = 0; i < env->count; i++) {
       void* ptr = &cr_handle_result;
       memcpy(env->frames[i].stack + CR_DEFAULT_STACK_SIZE - sizeof(void*), &ptr, sizeof(void*));
-      printf("%p\n", *((void**) (env->frames[i].stack + CR_DEFAULT_STACK_SIZE - sizeof(void*))));
       env->frames[i].rsp = (intptr_t) (env->frames[i].stack + CR_DEFAULT_STACK_SIZE - sizeof(void*));
       env->frames[i].rip = (intptr_t) func;
       env->frames[i].rdi = (intptr_t) i;
@@ -33,10 +32,14 @@ void** cr_run(cr_env* env, cr_thread_function func, void** batons) {
    }
    // TODO
    __asm__(  "mov %0, %%rsp;\n"
+	 "mov %2, %%rdi;\n"
+	 "mov %3, %%rsi;\n"
 	 "jmp *%1;\n"
 	 : // no output
 	 : "r" (env->frames[0].rsp),
-	 "r" (env->frames[0].rip)
+	 "r" (env->frames[0].rip),
+	 "r" (env->frames[0].rdi),
+	 "r" (env->frames[0].rsi)
 	 );
    return env->results;
 }

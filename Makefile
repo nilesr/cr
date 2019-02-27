@@ -1,18 +1,21 @@
 S=$(wildcard *.s)
 S_O=$(patsubst %.s,%.o,$(S))
+C=cr.c cr_yield_do.c
+C_O=$(patsubst %.c,%.o,$(C))
 CFLAGS=-ggdb3 -std=c11 -Wall
+ASFLAGS=-ggdb3
 
-test: $(S_O) cr.o
-	gcc $(CFLAGS) $(S_O) cr.o test.c -o test cr_yield_do.c
-
-cr.o: cr.c
-	gcc $(CFLAGS) -c cr.c -o cr.o
+test: $(S_O) $(C_O) test.c
+	gcc $(CFLAGS) $(S_O) $(C_O) test.c -o test
 
 $(S_O): %.o : %.s
-	as -o $@ $<
+	as $(ASFLAGS) -o $@ $<
+
+$(C_O): %.o : %.c
+	gcc $(CFLAGS) -o $@ -c $<
 
 clean:
-	rm -f $(S_O) cr.o test
+	rm -f $(S_O) $(C_O) test
 
 rlogin_build: clean
 	ssh nilesr@rlogin.cs.vt.edu rm -rf cr-auto
