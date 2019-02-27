@@ -1,8 +1,10 @@
 #include <stdio.h>
 #include "cr.h"
 
-void* thread_func(int tid, void* baton) {
+void* thread_func(cr_env* env, int tid, void* baton) {
    printf("Thread %d got baton %p\n", tid, baton);
+   cr_yield(env);
+   printf("Thread %d second time around\n", tid);
    return NULL;
 }
 

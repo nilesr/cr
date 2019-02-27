@@ -39,12 +39,16 @@ typedef struct cr_env {
 
 cr_env* cr_env_new(int n);
 
-typedef void* (*cr_thread_function)(int tid, void* baton);
+typedef void* (*cr_thread_function)(cr_env* env, int tid, void* baton);
 
 void** cr_run(cr_env* env, cr_thread_function func, void** batons);
 
 void cr_env_destroy(cr_env* env);
 
 void cr_handle_result();
+
+void cr_yield(cr_env* env);
+
+void cr_run_internal(cr_env* env);
 
 #endif

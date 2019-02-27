@@ -18,7 +18,7 @@ cr_env* cr_env_new(int n) {
    return r;
 }
 
-static void cr_run_internal(cr_env* env) {
+void cr_run_internal(cr_env* env) {
    if (env->dead == env->count) {
       printf("All threads have exited!\n");
       // TODO: restore state from master
@@ -99,9 +99,10 @@ void** cr_run(cr_env* env, cr_thread_function func, void** batons) {
       memcpy(env->frames[i].stack + CR_DEFAULT_STACK_SIZE - (2 * sizeof(void*)), &ptr, sizeof(void*));
       env->frames[i].rsp = (intptr_t) (env->frames[i].stack + CR_DEFAULT_STACK_SIZE - (2 * sizeof(void*)));
       env->frames[i].rip = (intptr_t) func;
-      env->frames[i].rdi = (intptr_t) i;
+      env->frames[i].rdi = (intptr_t) env;
+      env->frames[i].rsi = (intptr_t) i;
       if (batons != NULL) {
-	 env->frames[i].rsi = (intptr_t) batons[i];
+	 env->frames[i].rdx = (intptr_t) batons[i];
       }
    }
    // TODO save into master

@@ -33,4 +33,7 @@ rlogin_build: clean
 gdb: rlogin_build
 	ssh nilesr@rlogin.cs.vt.edu -t gdb cr-auto/test
 
+valgrind: rlogin_build
+	ssh nilesr@rlogin.cs.vt.edu -t valgrind cr-auto/test
+
 .PHONY: clean rlogin_build rlogin gdb all
