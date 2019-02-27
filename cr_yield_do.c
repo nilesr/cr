@@ -4,7 +4,7 @@
 
 void cr_yield_do(intptr_t rsp, cr_env* env) {
    __asm__(
-	 "movq %9, %%rsp;\n"
+	 "movq %11, %%rsp;\n"
 	 "popq %0;\n"
 	 "popq %1;\n"
 	 "popq %2;\n"
@@ -14,8 +14,13 @@ void cr_yield_do(intptr_t rsp, cr_env* env) {
 	 "popq %6;\n"
 	 "popq %7;\n"
 	 "popq %8;\n"
+	 "popq %9;\n"
+	 "popq %10;\n"
 	 :
-	 "=r" (env->frames[env->current].r13), // out
+	 "=r" (env->frames[env->current].r15), // out
+	 "=r" (env->frames[env->current].r14),
+
+	 "=r" (env->frames[env->current].r13),
 	 "=r" (env->frames[env->current].r12),
 	 "=r" (env->frames[env->current].r11),
 
@@ -31,7 +36,7 @@ void cr_yield_do(intptr_t rsp, cr_env* env) {
 	 );
    __asm__(
 	 "movq %6, %%rsp;\n"
-	 "lea 0x48(%%rsp), %%rsp;\n" // skip the 9 that we popped earlier
+	 "lea 0x58(%%rsp), %%rsp;\n" // skip the 11 that we popped earlier
 	 "popq %0;\n"
 	 "popq %1;\n"
 	 "popq %2;\n"

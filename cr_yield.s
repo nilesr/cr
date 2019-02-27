@@ -20,6 +20,8 @@ cr_yield:
 	pushq %r11
 	pushq %r12
 	pushq %r13
+	pushq %r14
+	pushq %r15
 	# pointer to env still in rdi, move to rsi for second argument
 	movq %rdi, %rsi
 	movq %rsp, %rdi

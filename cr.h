@@ -22,6 +22,8 @@ typedef struct cr_context {
 	intptr_t r11;
 	intptr_t r12;
 	intptr_t r13;
+	intptr_t r14;
+	intptr_t r15;
 	intptr_t rip;
 	bool dead;
 	unsigned stack_size;
