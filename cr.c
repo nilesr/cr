@@ -65,7 +65,7 @@ void cr_run_internal(cr_env* env) {
 	 "mov %0, %%rsp;\n"
 	 "pop %%rax;\n" // holds saved rip
 	 "mov %%rsp, %%rbx;\n" // holds rsp for the fake stack
-	 "pop %%rsp;\n" // load pointer to real stack into rsp -- this line is not working right
+	 "pop %%rsp;\n" // load pointer to real stack into rsp
 	 "push %%rax;\n" // put return pointer onto saved stack
 	 "mov %%rbx, %%rsp;\n" // reset rsp to fake stack again
 	 "lea 8(%%rsp), %%rsp;\n" // skip over the value that we popped since we saved this variable
