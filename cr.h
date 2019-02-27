@@ -6,18 +6,22 @@
 
 #define CR_DEFAULT_STACK_SIZE 65536
 
-void cr_yield(); // not sure about this
-
 typedef struct cr_context {
 	uint8_t* stack;
 	intptr_t rax;
 	intptr_t rbx;
 	intptr_t rcx;
 	intptr_t rdx;
-	intptr_t rbp;
 	intptr_t rsp;
+	intptr_t rbp;
 	intptr_t rsi;
 	intptr_t rdi;
+	intptr_t r8;
+	intptr_t r9;
+	intptr_t r10;
+	intptr_t r11;
+	intptr_t r12;
+	intptr_t r13;
 	intptr_t rip;
 	bool dead;
 	unsigned stack_size;

@@ -25,7 +25,7 @@ cr_yield_skip_begin:
 cr_yield_skip_end:
 	popq %rdi
 	popq %rsi
-	popq %rsp
+	popq %rsp # !?!?!?
 	popq %rbp
 	popq %rdx
 	popq %rcx
