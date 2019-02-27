@@ -87,7 +87,7 @@ void cr_run_internal(cr_env* env) {
 	 "lea -8(%%rsp), %%rsp;\n" // we pushed a pointer to return to onto this stack, but then loaded its old value, so correct for that
 	 "retq;\n"
 	 : // no output
-	 : "r" (((intptr_t) regs))
+	 : "r" ((intptr_t) regs)
 	 );
 }
 
