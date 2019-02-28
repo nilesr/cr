@@ -6,11 +6,20 @@
 #include <stdio.h>
 #include <fcntl.h>
 
+int i = 0;
+
 void* thread_func(cr_env* env, int tid, void* baton) {
    if (tid == 1) {
+      int bufs[100];
       while (!env->frames[0].dead) {
-	 printf("thread 0 yielded\n");
+	 if (i < 100) {
+	    bufs[i]++;
+	 }
+	 //printf("thread 0 yielded\n");
 	 cr_yield(env);
+      }
+      for (int ii = 0; ii < i; ii++) {
+	 printf("yielded %d times\n", bufs[ii]);
       }
       printf("thread 0 died\n");
       return NULL;
@@ -21,7 +30,8 @@ void* thread_func(cr_env* env, int tid, void* baton) {
    int read;
    int fd = open("/etc/passwd", O_RDONLY);
    while ((read = cr_aio_buf_read(buf, fd)) > 0) {
-      printf("read %d characters into %p\n", read, buf->buffer);
+      //printf("read %d characters into %p\n", read, buf->buffer);
+      i++;
    }
 
    return NULL;
