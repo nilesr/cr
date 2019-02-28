@@ -26,14 +26,15 @@ void* thread_func(cr_env* env, int tid, void* baton) {
    }
    printf("Thread %d got baton %p\n", tid, baton);
 
-   cr_aio_buf* buf = cr_aio_buf_new(env, 1024);
+   cr_aio_buf* buf = cr_aio_buf_new(env, NULL, 1024);
    int read;
    int fd = open("/etc/passwd", O_RDONLY);
    while ((read = cr_aio_buf_read(buf, fd)) > 0) {
       //printf("read %d characters into %p\n", read, buf->buffer);
       i++;
    }
-
+   close(fd);
+   cr_aio_buf_destroy(buf);
    return NULL;
 }
 
