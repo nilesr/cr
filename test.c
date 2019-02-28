@@ -38,7 +38,7 @@ void* thread_func(cr_env* env, int tid, void* baton) {
    return NULL;
 }
 
-int main(int argc, char** argv) {
+int main() {
    cr_env* env = cr_env_new(2);
    cr_run(env, &thread_func, NULL);
    cr_env_destroy(env);

@@ -99,9 +99,9 @@ void cr_run_internal(cr_env* env) {
 void** cr_run(cr_env* env, cr_thread_function func, void** batons) {
    env->current = 0;
    for (int i = 0; i < env->count; i++) {
-      void* ptr = &cr_handle_result;
+      void (*ptr)() = &cr_handle_result;
       memcpy(env->frames[i].stack + CR_DEFAULT_STACK_SIZE - sizeof(void*), &env, sizeof(void*));
-      memcpy(env->frames[i].stack + CR_DEFAULT_STACK_SIZE - (2 * sizeof(void*)), &ptr, sizeof(void*));
+      memcpy(env->frames[i].stack + CR_DEFAULT_STACK_SIZE - (2 * sizeof(void*)), &ptr, sizeof(ptr));
       env->frames[i].rsp = (intptr_t) (env->frames[i].stack + CR_DEFAULT_STACK_SIZE - (2 * sizeof(void*)));
       env->frames[i].rip = (intptr_t) func;
       env->frames[i].rdi = (intptr_t) env;
