@@ -53,4 +53,6 @@ void cr_yield(cr_env* env);
 
 void cr_run_internal(cr_env* env);
 
+#include "cr_aio.h"
+
 #endif
