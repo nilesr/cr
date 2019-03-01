@@ -13,9 +13,7 @@ ASFLAGS=-Ofast
 all: test
 
 libcr.a: $(S_O) $(C_O)
-	#ar cr $@ $(S_O) $(C_O)
 	ar rcs $@ $(S_O) $(C_O)
-	ranlib $@
 
 test: libcr.a $(T)
 
