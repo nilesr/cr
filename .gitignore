@@ -1,4 +1,6 @@
 *.o
 *.a
-test
 .gdb_history
+test/*/*
+!test/*/*.[ch]
+!test/*/Makefile

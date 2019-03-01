@@ -1,0 +1,15 @@
+C=$(wildcard *.c)
+C_O=$(patsubst %.c,%.o,$(C))
+THIS=$(notdir $(CURDIR))
+
+$(THIS): $(C_O)
+	gcc $^ $(CFLAGS) -o $@
+
+$(C_O): %.o : %.c
+	gcc $(CFLAGS) -o $@ -c $<
+
+clean:
+	rm -f $(C_O) $(THIS)
+
+.PHONY: clean
+.DEFAULT_GOAL := $(THIS)

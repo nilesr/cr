@@ -2,18 +2,29 @@ S=$(wildcard *.s)
 S_O=$(patsubst %.s,%.o,$(S))
 C=cr.c cr_yield_do.c cr_aio.c
 C_O=$(patsubst %.c,%.o,$(C))
+T=$(patsubst test/%,%,$(wildcard test/*))
+T_CLEAN=$(patsubst %,clean_%,$(T))
 
-CFLAGS=-ggdb3 -std=c11 -Wall -Wextra --pedantic -Ofast -lrt
-ASFLAGS=-ggdb3 -Ofast
+
+CFLAGS=-std=c11 -Wall -Wextra --pedantic -Ofast -lrt
+TEST_CFLAGS=-I../.. -L../.. -lcr
+ASFLAGS=-Ofast
 
 all: test
 
 libcr.a: $(S_O) $(C_O)
-	ar cr $@ $(S_O) $(C_O)
+	#ar cr $@ $(S_O) $(C_O)
+	ar rcs $@ $(S_O) $(C_O)
 	ranlib $@
 
-test: libcr.a test.c
-	gcc $(CFLAGS) -o $@ test.c libcr.a
+test: libcr.a $(T)
+
+$(T): CFLAGS += $(TEST_CFLAGS)
+$(T):
+	$(MAKE) -f ../../Makefile.tests -C test/$@ CFLAGS="$(CFLAGS)"
+
+$(T_CLEAN):
+	$(MAKE) -f ../../Makefile.tests -C test/$(subst clean_,,$@) clean
 
 $(S_O): %.o : %.s
 	as $(ASFLAGS) -o $@ $<
@@ -21,8 +32,8 @@ $(S_O): %.o : %.s
 $(C_O): %.o : %.c
 	gcc $(CFLAGS) -o $@ -c $<
 
-clean:
-	rm -f $(S_O) $(C_O) test
+clean: $(T_CLEAN)
+	rm -f $(S_O) $(C_O) libcr.a
 
 rlogin_build: clean
 	ssh nilesr@rlogin.cs.vt.edu rm -rf cr-auto
@@ -33,4 +44,4 @@ rlogin_build: clean
 gdb: rlogin_build
 	ssh nilesr@rlogin.cs.vt.edu -t gdb cr-auto/test
 
-.PHONY: clean rlogin_build rlogin gdb all
+.PHONY: clean rlogin_build rlogin gdb all $(T) $(T_CLEAN)
