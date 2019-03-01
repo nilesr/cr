@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <fcntl.h>
 #include <stdio.h>
+#include <assert.h>
 
 #include "cr.h"
 
@@ -37,7 +38,7 @@ void* thread_func(cr_env* env, int tid, void* baton) {
 	 }
       }
    }
-   int fd = open("/etc/passwd", O_RDONLY);
+   int fd = open(baton, O_RDONLY);
 
    cr_aio_buf* buf = cr_aio_buf_new(env, buf1, 1024);
    while (true) {
@@ -58,9 +59,10 @@ void* thread_func(cr_env* env, int tid, void* baton) {
    return NULL;
 }
 
-int main() {
+int main(int argc, char** argv) {
+   assert(argc > 1);
    cr_env* env = cr_env_new(2);
-   cr_run(env, &thread_func, NULL);
+   cr_run(env, &thread_func, (void*[]) {argv[1], NULL});
    cr_env_destroy(env);
 }
 

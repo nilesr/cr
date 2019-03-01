@@ -1,6 +1,6 @@
 S=$(wildcard *.s)
 S_O=$(patsubst %.s,%.o,$(S))
-C=cr.c cr_yield_do.c cr_aio.c
+C=$(wildcard *.c)
 C_O=$(patsubst %.c,%.o,$(C))
 T=$(patsubst test/%,%,$(wildcard test/*))
 T_CLEAN=$(patsubst %,clean_%,$(T))
