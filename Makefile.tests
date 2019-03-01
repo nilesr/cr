@@ -3,13 +3,18 @@ C_O=$(patsubst %.c,%.o,$(C))
 THIS=$(notdir $(CURDIR))
 
 $(THIS): $(C_O)
+ifneq (,$(wildcard Makefile))
+	$(MAKE)
+endif
 	gcc $^ $(CFLAGS) -o $@
 
 $(C_O): %.o : %.c ../../libcr.a
 	gcc $(CFLAGS) -o $@ -c $<
 
 clean:
+ifneq (,$(wildcard Makefile))
+	$(MAKE) clean
+endif
 	rm -f $(C_O) $(THIS)
 
 .PHONY: clean
-.DEFAULT_GOAL := $(THIS)
