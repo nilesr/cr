@@ -13,7 +13,7 @@ ASFLAGS=-Ofast
 all: test
 
 libcr.a: $(S_O) $(C_O)
-	ar rcs $@ $(S_O) $(C_O)
+	ar rcs $@ $^
 
 test: libcr.a $(T)
 
