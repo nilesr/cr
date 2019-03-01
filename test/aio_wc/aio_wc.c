@@ -6,35 +6,37 @@
 
 #include "cr.h"
 
-int lines = 0;
 int b1_state = 0;
 uint8_t buf1[1024];
 int b2_state = 0;
 uint8_t buf2[1024];
 
-void count_lines(uint8_t* buf, int length) {
+int count_lines(uint8_t* buf, int length) {
+   int lines = 0;
    for (int i = 0; i < length; i++) {
       if (buf[i] == '\n') {
 	 lines++;
       }
    }
+   return lines;
 }
 
 void* thread_func(cr_env* env, int tid, void* baton) {
    if (tid == 1) {
+      int lines = 0;
       while (true) {
 	 if (b1_state != 0) {
-	    count_lines(buf1, b1_state);
+	    lines += count_lines(buf1, b1_state);
 	    b1_state = 0;
 	 }
 	 if (b2_state != 0) {
-	    count_lines(buf2, b2_state);
+	    lines += count_lines(buf2, b2_state);
 	    b2_state = 0;
 	 }
 	 cr_yield(env);
 	 if (env->frames[0].dead) {
-	    printf("Counted %d lines\n", lines);
-	    return NULL;
+	    *((int*) baton) = lines;
+	    return baton;
 	 }
       }
    }
@@ -61,8 +63,10 @@ void* thread_func(cr_env* env, int tid, void* baton) {
 
 int main(int argc, char** argv) {
    assert(argc > 1);
+   int lines;
    cr_env* env = cr_env_new(2);
-   cr_run(env, &thread_func, (void*[]) {argv[1], NULL});
+   cr_run(env, &thread_func, (void*[]) {argv[1], &lines});
+   printf("Counted %d lines\n", lines);
    cr_env_destroy(env);
 }
 

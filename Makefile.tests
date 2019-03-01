@@ -5,7 +5,7 @@ THIS=$(notdir $(CURDIR))
 $(THIS): $(C_O)
 	gcc $^ $(CFLAGS) -o $@
 
-$(C_O): %.o : %.c
+$(C_O): %.o : %.c ../../libcr.a
 	gcc $(CFLAGS) -o $@ -c $<
 
 clean:

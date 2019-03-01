@@ -20,14 +20,13 @@ cr_env* cr_env_new(int n) {
 }
 
 void cr_run_internal(cr_env* env) {
-   if (env->dead == env->count) {
-      printf("All threads have exited!\n");
-      // TODO: restore state from master
-      exit(0);
+   cr_context* frame = &env->master;
+   if (env->dead != env->count) {
+      do {
+	 env->current = (env->current + 1) % env->count;
+      } while (env->frames[env->current].dead);
+      frame = &env->frames[env->current];
    }
-   do {
-      env->current = (env->current + 1) % env->count;
-   } while (env->frames[env->current].dead);
    // idea
    // construct an array of all the register values
    // such that rip and rsp come first
@@ -40,27 +39,27 @@ void cr_run_internal(cr_env* env) {
    // pop saved rsp into rsp last
    // ret -- this will pop an instruction pointer off the stack and jump to it, and stack pointer will still be set correctly
    intptr_t* regs = alloca(18 * sizeof(intptr_t));
-   memcpy(regs + 0, &env->frames[env->current].rip, sizeof(intptr_t));
-   memcpy(regs + 1, &env->frames[env->current].rsp, sizeof(intptr_t));
+   memcpy(regs + 0, &frame->rip, sizeof(intptr_t));
+   memcpy(regs + 1, &frame->rsp, sizeof(intptr_t));
 
-   memcpy(regs + 2, &env->frames[env->current].r15, sizeof(intptr_t));
-   memcpy(regs + 3, &env->frames[env->current].r14, sizeof(intptr_t));
-   memcpy(regs + 4, &env->frames[env->current].r13, sizeof(intptr_t));
-   memcpy(regs + 5, &env->frames[env->current].r12, sizeof(intptr_t));
-   memcpy(regs + 6, &env->frames[env->current].r11, sizeof(intptr_t));
-   memcpy(regs + 7, &env->frames[env->current].r10, sizeof(intptr_t));
-   memcpy(regs + 8, &env->frames[env->current].r9, sizeof(intptr_t));
-   memcpy(regs + 9, &env->frames[env->current].r8, sizeof(intptr_t));
-   memcpy(regs + 10, &env->frames[env->current].rdi, sizeof(intptr_t));
-   memcpy(regs + 11, &env->frames[env->current].rsi, sizeof(intptr_t));
-   memcpy(regs + 12, &env->frames[env->current].rbp, sizeof(intptr_t));
+   memcpy(regs + 2, &frame->r15, sizeof(intptr_t));
+   memcpy(regs + 3, &frame->r14, sizeof(intptr_t));
+   memcpy(regs + 4, &frame->r13, sizeof(intptr_t));
+   memcpy(regs + 5, &frame->r12, sizeof(intptr_t));
+   memcpy(regs + 6, &frame->r11, sizeof(intptr_t));
+   memcpy(regs + 7, &frame->r10, sizeof(intptr_t));
+   memcpy(regs + 8, &frame->r9, sizeof(intptr_t));
+   memcpy(regs + 9, &frame->r8, sizeof(intptr_t));
+   memcpy(regs + 10, &frame->rdi, sizeof(intptr_t));
+   memcpy(regs + 11, &frame->rsi, sizeof(intptr_t));
+   memcpy(regs + 12, &frame->rbp, sizeof(intptr_t));
    // skip rsp
-   memcpy(regs + 13, &env->frames[env->current].rdx, sizeof(intptr_t));
-   memcpy(regs + 14, &env->frames[env->current].rcx, sizeof(intptr_t));
-   memcpy(regs + 15, &env->frames[env->current].rbx, sizeof(intptr_t));
-   memcpy(regs + 16, &env->frames[env->current].rax, sizeof(intptr_t));
+   memcpy(regs + 13, &frame->rdx, sizeof(intptr_t));
+   memcpy(regs + 14, &frame->rcx, sizeof(intptr_t));
+   memcpy(regs + 15, &frame->rbx, sizeof(intptr_t));
+   memcpy(regs + 16, &frame->rax, sizeof(intptr_t));
    // rsp as last thing to be popped before we ret
-   memcpy(regs + 17, &env->frames[env->current].rsp, sizeof(intptr_t));
+   memcpy(regs + 17, &frame->rsp, sizeof(intptr_t));
 
    // Do not make regs a regular array, gcc thinks we don't use the values in it and optimizes it out
 
@@ -110,9 +109,8 @@ void** cr_run(cr_env* env, cr_thread_function func, void** batons) {
 	 env->frames[i].rdx = (intptr_t) batons[i];
       }
    }
-   // TODO save into master
    env->current = -1;
-   cr_run_internal(env);
+   cr_yield(env);
    return env->results;
 }
 
@@ -126,7 +124,6 @@ void cr_env_destroy(cr_env* env) {
 }
 
 void cr_handle_result_inner(void* result, cr_env* env) {
-   printf("Got result %p\n", result);
    env->results[env->current] = result;
    env->frames[env->current].dead = true;
    env->dead++;
