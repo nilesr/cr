@@ -37,8 +37,7 @@ void cr_yield_do(intptr_t rsp, cr_env* env) {
 	 : "%rsp"
 	 );
    __asm__(
-	 "movq %6, %%rsp;\n"
-	 "lea 0x58(%%rsp), %%rsp;\n" // skip the 11 that we popped earlier
+	 "lea 0x58(%6), %%rsp;\n" // skip the 11 that we popped earlier
 	 "popq %0;\n"
 	 "popq %1;\n"
 	 "popq %2;\n"
