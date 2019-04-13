@@ -2,7 +2,7 @@
 
 Coroutines TS has been officially incorporated into C++21. Unfortunately it's not 2021 (yet), and also unfortunately, many projects use C not C++.
 
-`cr` adds coroutines to C, with a round-robin scheduling system. You start a `cr` environment (`cr_env`) by providing a function to call and the number of frames, and `cr` creates that many frames and stacks, switching between them when the user-supplied function calls `cr_yield(env)`. When you create an environment, you can optionally pass an array of n user data pointers, called batons, which will be passed to the corresponding thread. Each frame returns a single result, also a void pointer, which can be accessed through `env->results` after all the frames are done executing.
+`cr` adds coroutines to C, with a round-robin scheduling system. You start a `cr` environment (`cr_env`) by providing a function to call and the number of frames, and `cr` creates that many frames and stacks, switching between them when the user-supplied function calls `cr_yield(env)`. When you create an environment, you can optionally pass an array of n user data pointers, called batons, which will be passed to the corresponding frame. Each frame returns a single result, also a void pointer, which can be accessed through `env->results` after all the frames are done executing.
 
 Here is an example:
 
@@ -69,7 +69,7 @@ The environment has the following helpful properties:
 * `int count`: The `n` that was passed in to `cr_env_new`.
 * `int current`: The frame ID of frame that is currently executing, or -1 if no frame is executing.
 * `int dead`: The number of frames which have completed their execution and returned.
-* `void** results`: An array of the results of each thread. Initialized to all NULLs before any of the threads have completed.
+* `void** results`: An array of the results of each frame. Initialized to all NULLs before any of the frames have completed.
 * `cr_context* frames`: The only thing interesting in here is the `dead` flag on each of the frames. If `env->frames[i].dead` is true for some `i`, then `env->results[i]` is safe to access. If `env->dead == env->count` then they are all safe to access.
 
 `cr` does not expect any of these properties to be modified.
