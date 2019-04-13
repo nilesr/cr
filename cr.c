@@ -127,5 +127,6 @@ void cr_handle_result_inner(void* result, cr_env* env) {
    env->results[env->current] = result;
    env->frames[env->current].dead = true;
    env->dead++;
+   // TODO we can probably free the stack here, instead of waiting for cr_env_destroy
    cr_run_internal(env);
 }

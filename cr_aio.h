@@ -13,7 +13,7 @@ cr_aio_buf* cr_aio_buf_new(cr_env* env, uint8_t* buf, int size);
 
 int cr_aio_buf_read(cr_aio_buf* buf, int fd);
 
-int cr_aio_buf_write(cr_aio_buf* buf, int fd);
+int cr_aio_buf_write(cr_aio_buf* buf, int fd, int n);
 
 void cr_aio_buf_destroy(cr_aio_buf* buf);
 

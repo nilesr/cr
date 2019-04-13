@@ -30,7 +30,6 @@ int cr_aio_buf_read(cr_aio_buf* buf, int fd) {
       return -1;
    }
    int num_read = aio_return(&cb);
-   assert(num_read != ENOSYS && num_read != EINVAL);
    if (num_read == -1) {
       // errno is set
       return -1;
@@ -39,8 +38,12 @@ int cr_aio_buf_read(cr_aio_buf* buf, int fd) {
    return num_read;
 }
 
-int cr_aio_buf_write(cr_aio_buf* buf, int fd) {
-   struct aiocb cb = {.aio_fildes = fd, .aio_buf = buf->buffer, .aio_nbytes = buf->size, .aio_lio_opcode = LIO_WRITE, .aio_offset = buf->start};
+int cr_aio_buf_write(cr_aio_buf* buf, int fd, int n) {
+   if (n > buf->size) {
+      errno = EDOM;
+      return -1;
+   }
+   struct aiocb cb = {.aio_fildes = fd, .aio_buf = buf->buffer, .aio_nbytes = n, .aio_lio_opcode = LIO_WRITE, .aio_offset = buf->start};
    int result = aio_write(&cb);
    if (result != 0) {
       errno = result;
@@ -55,7 +58,6 @@ int cr_aio_buf_write(cr_aio_buf* buf, int fd) {
       return -1;
    }
    int num_read = aio_return(&cb);
-   assert(num_read != ENOSYS && num_read != EINVAL);
    if (num_read == -1) {
       // errno is set
       return -1;
